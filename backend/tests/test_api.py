@@ -1,5 +1,37 @@
+import pytest
+import psycopg2
 from fastapi.testclient import TestClient
 from app import app
+
+# Replace with your actual test DB credentials
+DB_CONFIG = {
+    "host": "localhost",
+    "database": "your_test_db",
+    "user": "your_db_user",
+    "password": "your_db_password"
+}
+
+def get_db_connection():
+    conn = psycopg2.connect(**DB_CONFIG)
+    return conn
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS blog_posts (
+            id SERIAL PRIMARY KEY,
+            title VARCHAR(255) NOT NULL,
+            content TEXT NOT NULL,
+            author VARCHAR(100) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+    conn.commit()
+    yield
+    cursor.close()
+    conn.close()
 
 client = TestClient(app)
 
