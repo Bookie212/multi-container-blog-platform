@@ -4,15 +4,15 @@ import psycopg2
 from fastapi.testclient import TestClient
 from app import app
 
-DB_CONFIG = os.getenv(
-    "host": "localhost",
-    "database": "blogdb",
-    "user": "bloguser",
-    "password": "blogpassword"
-)
+DB_CONFIG = {
+    "host": os.getenv("DB_HOST", "localhost"),
+    "database": os.getenv("DB_NAME", "blogdb"),
+    "user": os.getenv("DB_USER", "bloguser"),
+    "password": os.getenv("DB_PASSWORD", "blogpassword")
+}
 
 def get_db_connection():
-    conn = psycopg2.connect(DB_CONFIG)
+    conn = psycopg2.connect(**DB_CONFIG)
     return conn
 
 @pytest.fixture(scope="session", autouse=True)
