@@ -1,4 +1,5 @@
 import psycopg2
+import os
 from psycopg2.extras import RealDictCursor
 from fastapi import FastAPI
 from models import BlogPost, BlogPostCreate
@@ -8,10 +9,10 @@ from typing import List, Dict
 def connect_db():
     try:
         conn = psycopg2.connect(
-            host="db",
-            database="blog_db",
-            user="bloguser",
-            password="blogpassword",
+            host=os.getenv("DB_HOST", "db"),
+            database=os.getenv("DB_NAME",    "blog_db"),
+            user=os.getenv("DB_USER", "bloguser"),
+            password=os.getenv("DB_PASSWORD", "blogpassword"),
             port=5432,
             cursor_factory=RealDictCursor
         )

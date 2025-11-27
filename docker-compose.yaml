@@ -13,7 +13,8 @@ services:
       - db_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend
+    image: bookie212/blog-backend:latest 
+    #build: ./backend
     depends_on:
       - db
     environment:
@@ -22,7 +23,8 @@ services:
       - "8000:8000"
 
   nginx:
-    build: ./nginx
+    image: bookie212/blog-nginx:latest
+    #build: ./nginx
     depends_on:
       - backend
     ports:
