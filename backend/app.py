@@ -1,7 +1,7 @@
 import psycopg2
 import os
 from psycopg2.extras import RealDictCursor
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from models import BlogPost, BlogPostCreate
 from typing import List, Dict
 
@@ -110,13 +110,15 @@ def read_post(post_id: int):
       
       cursor.execute("SELECT * FROM blog_posts WHERE id = %s;", (post_id,))
       post = cursor.fetchone()
+      if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
       return post
     finally:
       cursor.close()
       conn.close()
 
 @app.put("/posts/{post_id}", response_model=BlogPost)
-def update_post(post_id: int, post: BlogPost):
+def update_post(post_id: int, post: BlogPostCreate):
     conn = connect_db()
     if not conn:  
         return {"error": "Database connection failed"}
