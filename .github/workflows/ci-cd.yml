@@ -41,10 +41,15 @@ jobs:
 
       - name: Run tests
         env:
+          DB_HOST: localhost
+          DB_NAME: blogdb
+          DB_USER: bloguser
+          DB_PASSWORD: blogpassword
+          DB_PORT: 5432
           DATABASE_URL: postgresql://bloguser:blogpassword@localhost:5432/blogdb
         run: |
           cd backend
-          pytest tests
+          pytest tests/
 
 
   build-and-push:
