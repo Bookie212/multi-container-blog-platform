@@ -89,4 +89,32 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/my-nginx:latest
             ${{ secrets.DOCKER_USERNAME }}/my-nginx:${{ github.sha}}
 
-      
+
+  security-scan:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Run Trivy vulnerability scanner on backend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ secrets.DOCKER_USERNAME }}/my-backend:latest'
+          format: 'sarif'
+          output: 'trivy-results-backend.sarif'
+          
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results-backend.sarif'
+          
+      - name: Run Trivy vulnerability scanner on nginx
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ secrets.DOCKER_USERNAME }}/my-nginx:latest'
+          format: 'sarif'
+          output: 'trivy-results-nginx.sarif'
+          
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results-nginx.sarif'    
