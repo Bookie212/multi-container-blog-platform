@@ -93,6 +93,8 @@ jobs:
   security-scan:
     needs: build-and-push
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write 
     
     steps:
       - name: Run Trivy vulnerability scanner on backend
@@ -103,7 +105,7 @@ jobs:
           output: 'trivy-results-backend.sarif'
           
       - name: Upload Trivy results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results-backend.sarif'
           
@@ -115,6 +117,6 @@ jobs:
           output: 'trivy-results-nginx.sarif'
           
       - name: Upload Trivy results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results-nginx.sarif'    
