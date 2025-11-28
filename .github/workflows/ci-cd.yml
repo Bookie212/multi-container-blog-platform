@@ -108,6 +108,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results-backend.sarif'
+          category: 'Backend Vulnerability Scan'
           
       - name: Run Trivy vulnerability scanner on nginx
         uses: aquasecurity/trivy-action@master
@@ -120,3 +121,4 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results-nginx.sarif'    
+          category: 'Nginx Vulnerability Scan'
