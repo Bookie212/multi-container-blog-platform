@@ -1,14 +1,15 @@
-FROM python:3.12.3-slim
+FROM python:3.12.3-slim-bookworm
+
+WORKDIR /home/app
 
 RUN apt-get update && \
     apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/app
+    COPY requirements.txt .
 
-COPY requirements.txt .
-
-RUN pip install  -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install  -r requirements.txt
 
 COPY app.py models.py ./
 
