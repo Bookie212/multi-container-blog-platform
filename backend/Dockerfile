@@ -2,7 +2,10 @@ FROM python:3.14-alpine
 
 WORKDIR /home/app
 
-RUN apk add --no-cache postgresql-libs
+RUN apk update && apk upgrade
+
+RUN apk add --no-cache \
+    postgresql-libs
 
 RUN apk add --no-cache --virtual .build-deps \
     gcc \ 
