@@ -1,23 +1,15 @@
-FROM python:3.14-alpine
+FROM python:3.11-slim
 
 WORKDIR /home/app
 
-RUN apk update && apk upgrade
-
-RUN apk add --no-cache \
-    postgresql-libs
-
-RUN apk add --no-cache --virtual .build-deps \
-    gcc \ 
-    musl-dev \ 
-    postgresql-dev
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y gcc libpq-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install  --no-cache-dir -r requirements.txt
-
-RUN apk del .build-deps
 
 COPY app.py models.py ./
 
