@@ -1,15 +1,20 @@
-FROM python:3.12.3-slim-bookworm
+FROM python:3.12-alpine
 
 WORKDIR /home/app
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache postgresql-libs
 
-    COPY requirements.txt .
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \ 
+    musl-dev \ 
+    postgresql-dev
 
-RUN pip install --upgrade pip && \
-    pip install  -r requirements.txt
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install  --no-cache-dir -r requirements.txt
+
+RUN apk del .build-deps
 
 COPY app.py models.py ./
 
