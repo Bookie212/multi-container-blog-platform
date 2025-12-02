@@ -146,9 +146,10 @@ jobs:
           instance-ids: ${{ secrets.EC2_INSTANCE_ID }}
           document-name: AWS-RunShellScript
           comment: "Deploy latest backend and nginx"
-          parameters: |
-            commands:
-              - cd /home/ubuntu/blog-platform
-              - docker-compose pull
-              - docker-compose up -d --remove-orphans
-              - docker system prune -f
+          parameters: >
+            {"commands": [
+              "cd /home/ubuntu/blog-platform",
+              "docker compose pull",
+              "docker compose up -d --remove-orphans",
+              "docker system prune -f"
+            ]}
