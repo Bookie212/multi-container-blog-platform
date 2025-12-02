@@ -129,7 +129,7 @@ jobs:
           category: 'Nginx Vulnerability Scan'
 
   deploy-staging:
-    needs: build-and-push
+    needs: security-scan
     runs-on: ubuntu-latest
     
     steps:
