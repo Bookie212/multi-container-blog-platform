@@ -131,25 +131,20 @@ jobs:
   deploy-staging:
     needs: security-scan
     runs-on: ubuntu-latest
+    environment: staging
 
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Deploy to EC2 using SSM
+        uses: Castlenine/aws-ssm-command@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Deploy to EC2 using SSM
-        uses: Castlenine/aws-ssm-command@v1
-        with:
           instance-ids: ${{ secrets.EC2_INSTANCE_ID }}
-          document-name: AWS-RunShellScript
-          comment: "Deploy latest backend and nginx"
-          parameters: >
-            {"commands": [
-              "cd /home/ubuntu/blog-platform",
-              "docker compose pull",
-              "docker compose up -d --remove-orphans",
-              "docker system prune -f"
-            ]}
+          command: |
+            cd /home/ubuntu/blog-platform
+            docker pull ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx:latest
+            docker compose up -d --remove-orphans
+            docker system prune -f
