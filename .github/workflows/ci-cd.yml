@@ -143,8 +143,8 @@ jobs:
 
           instance-ids: ${{ secrets.EC2_INSTANCE_ID }}
           command: |
-            cd /home/ec2-user/blog-platform && 
+            cd /home/ec2-user/blog-platform
             docker pull ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
             docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx:latest
-            docker compose up -d --remove-orphans
+            docker compose up -d
             docker system prune -f
