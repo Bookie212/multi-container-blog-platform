@@ -131,7 +131,7 @@ jobs:
   deploy-staging:
     needs: security-scan
     runs-on: ubuntu-latest
-    environment: staging
+    if: github.ref == 'refs/heads/master'
 
     steps:
       - name: Deploy to EC2 using SSM
@@ -143,7 +143,7 @@ jobs:
 
           instance-ids: ${{ secrets.EC2_INSTANCE_ID }}
           command: |
-            #!/bin/sh -lc cd /home/ubuntu/blog-platform && 
+            cd /home/ec2-user/blog-platform && 
             docker pull ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
             docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx:latest
             docker compose up -d --remove-orphans
