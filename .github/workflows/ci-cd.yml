@@ -143,9 +143,9 @@ jobs:
 
           instance-ids: ${{ secrets.EC2_INSTANCE_ID }}
           commands: 
-              - cd /home/ec2-user/blog-platform
-              - docker pull ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
-              - docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx:latest
-              - docker compose up -d --remove-orphans
-              - docker system prune -f
+            - cd /home/ec2-user/blog-platform
+            - docker pull ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
+            - docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx:latest
+            - docker compose up -d --remove-orphans
+            - docker system prune -f
               
