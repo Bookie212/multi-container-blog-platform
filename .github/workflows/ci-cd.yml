@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: http://${{ secrets.EC2_HOST }}
+      EC2_HOST_URL: http://${{ secrets.EC2_HOST }}
 
     steps:
       - name: Generate version tag
