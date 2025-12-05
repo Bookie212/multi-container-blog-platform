@@ -74,6 +74,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Generate version tag
+        id: version
+        run: |
+          echo "VERSION=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+          echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
       - name: Build and Push Backend
         uses: docker/build-push-action@v5
         with:
@@ -129,12 +135,18 @@ jobs:
           category: 'Nginx Vulnerability Scan'
 
   deploy-staging:
-    needs: security-scan
+    needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    environment:
+      name: production
+      url: http://${{ secrets.EC2_HOST }}
 
     steps:
-      - name: Deploy to EC2 using SSM
+      - name: Generate version tag
+        id: version
+        run: echo "VERSION=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Deploy to EC2 using SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -142,8 +154,34 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/blog-platform
-            docker pull ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
-            docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx:latest
+
+            docker-compose ps -q > ~/current-containers.txt
+
+            export VERSION=${{ steps.version.outputs.VERSION }}
+            docker pull ${{ secrets.DOCKER_USERNAME }}/my-backend:${VERSION}
+            docker pull ${{ secrets.DOCKER_USERNAME }}/my-nginx:${VERSION}
+
+            docker tag ${{ secrets.DOCKER_USERNAME }}/my-backend:${VERSION} ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
+            docker tag ${{ secrets.DOCKER_USERNAME }}/my-nginx:${VERSION} ${{ secrets.DOCKER_USERNAME }}/my-nginx:latest
+
             docker-compose up -d
             docker system prune -f
+
+      - name: Health Check
+        run: |
+          sleep 10
+          curl -f http://${{ secrets.EC2_HOST }}/ || exit 1
+
+      - name: Notify Deployment Success
+        if: success()
+        run: |
+          echo "🚀 Deployment successful!"
+          echo "Version: ${{ steps.version.outputs.VERSION }}"
+          echo "URL: http://${{ secrets.EC2_HOST }}"
+        
+      - name: Notify Deployment Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Consider rolling back."
               
