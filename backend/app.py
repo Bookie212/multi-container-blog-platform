@@ -4,6 +4,7 @@ from psycopg2.extras import RealDictCursor
 from fastapi import FastAPI, HTTPException
 from models import BlogPost, BlogPostCreate
 from typing import List, Dict
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # Database connection
 def connect_db():
@@ -67,6 +68,8 @@ def get_all_db():
 
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app)
 
 @app.on_event("startup")
 def startup():
